@@ -53,11 +53,11 @@ func main(){
 	// http.FileServer(http.Dir(".") -> This gives us a fileserver that can handle requests 
 	// Why StripPrefix -> /app/ doesnt exist in our root 
 
-	fsHandler := http.StripPrefix("/app",http.FileServer(http.Dir(".")))
+	fsHandler := http.StripPrefix("/app/",http.FileServer(http.Dir(".")))
 
 	wrappedHandler := apiCfg.middlewareMetricsInc(fsHandler)
 
-	regisBook.Handle("/app", wrappedHandler)
+	regisBook.Handle("/app/", wrappedHandler)
 
 	regisBook.HandleFunc("GET /metrics", apiCfg.numOfHits)
 
