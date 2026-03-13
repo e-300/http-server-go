@@ -48,6 +48,7 @@ func main(){
 	}
 
 	// NewServeMux -> lookup table matching incoming request -> endpoint -> Handler
+	// regisBook is the name i picked instead of typically mux 
 	regisBook := http.NewServeMux()
 	// Handle -> expects: Handler Object, http.FilerServer returns one of those handler objects
 	// http.FileServer(http.Dir(".") -> This gives us a fileserver that can handle requests 
