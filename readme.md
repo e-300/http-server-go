@@ -48,4 +48,6 @@ Just documenting the patterns and knowledge im learning for my personal record a
         | `/app/js/main.js` | Send to `FileServer` | Match `js/main.js` | `./static/js/main.js` |
 
 
-
+### Handle vs Handler
+    HandleFunc (handle): The "Action" (Registering).
+    HandlerFunc (handler): The "Wrapper" (Converting).
