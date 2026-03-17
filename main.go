@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"sync/atomic"
@@ -50,32 +51,70 @@ func handlerReadiness(w http.ResponseWriter, r *http.Request){
 
 
 // helper funcs
-func respondWithError(w http.ResponseWriter, code int, msg string)
+func respondWithError(w http.ResponseWriter, code int, msg string) error{
+	return respondWithJSON(w, code, map[string]string{"error" : msg})
+}
 
-func respondwithJSON(w http.ResponseWriter, code int, payload interface{})
+// Generic Helper
+func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) error{
+	// Serlizing payload into json byte slice
+	response, err := json.Marshal(payload)
+	if err != nil{
+		return err
+	}
+	// Telling Client we are sending back a json response
+	w.Header().Set("Content-Type", "application/json")
+	// Cors header allowing any origin allowed to recieve this response
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(code)
+	w.Write(response)
+	return nil
+}
+
 
 // JSON FUNCTION 1 
-func validateChirp(w http.ResponseWriter, r *http.Request){
-	type parameters struct{
-		Body string // key will be msg
+func validateChirp(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	type requestBody struct{
+		Msg string `json:"body"`
 	}
 
-	decoder := json.NewDecoder(r.Body)
-	params := parameters{}
-	err := decoder.Decode(&params)
+	type responseBody struct {
+		Valid bool `json:"valid"`
+	}
+	
+
+	dat, err := io.ReadAll(r.Body)
 	if err != nil{
-		log.Printf("Error Something went wrong", err)
-		w.WriteHeader(500)
-		// call respondWithError - pass writer, response code, msg string
-		return
-	} 
-
-	// payload
-	type res struct{
-		res bool
+		err := respondWithError(w, 500, "Something went wrong")
+		if err != nil{
+			log.Println(err)
+		}
+		return 
+	}
+	
+	params := requestBody{}
+	err = json.Unmarshal(dat, &params)
+	if err != nil{
+		err := respondWithError(w, 500, "Something went wrong")
+		if err != nil{
+			log.Println(err)
+		}
+		return 
 	}
 
-	// call respond with json - pass writer, response code , payload interface{}
+
+	if len(params.Msg) > 140{
+		err := respondWithError(w, 400, "Chirp is too long")
+		if err != nil{
+			log.Println(err)
+		}
+		return 
+	}
+
+	respondWithJSON(w, 200, responseBody{
+		Valid: true,
+	})
 
 }
 
