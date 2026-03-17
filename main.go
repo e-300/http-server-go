@@ -50,12 +50,10 @@ func handlerReadiness(w http.ResponseWriter, r *http.Request){
 }
 
 
-// helper funcs
+// JSON request helper functions 
 func respondWithError(w http.ResponseWriter, code int, msg string) error{
 	return respondWithJSON(w, code, map[string]string{"error" : msg})
 }
-
-// Generic Helper
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) error{
 	// Serlizing payload into json byte slice
 	response, err := json.Marshal(payload)
@@ -72,7 +70,7 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) error
 }
 
 
-// JSON FUNCTION 1 
+// 
 func validateChirp(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	type requestBody struct{
@@ -83,7 +81,7 @@ func validateChirp(w http.ResponseWriter, r *http.Request) {
 		Valid bool `json:"valid"`
 	}
 	
-
+	// Reading raw JSON bytes from request 
 	dat, err := io.ReadAll(r.Body)
 	if err != nil{
 		err := respondWithError(w, 500, "Something went wrong")
@@ -93,6 +91,7 @@ func validateChirp(w http.ResponseWriter, r *http.Request) {
 		return 
 	}
 	
+	// Raw bytes Mapped into request struct 
 	params := requestBody{}
 	err = json.Unmarshal(dat, &params)
 	if err != nil{
@@ -103,7 +102,7 @@ func validateChirp(w http.ResponseWriter, r *http.Request) {
 		return 
 	}
 
-
+	// Business Logic
 	if len(params.Msg) > 140{
 		err := respondWithError(w, 400, "Chirp is too long")
 		if err != nil{
@@ -143,7 +142,6 @@ func main(){
 
 	regisBook.HandleFunc("GET /api/healthz", handlerReadiness)
 
-	//new endpoint
 	regisBook.HandleFunc("POST /api/validate_chirp", validateChirp)
 	
 	server := http.Server{
