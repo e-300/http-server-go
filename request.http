@@ -3,3 +3,32 @@
 GET {{host}}/admin/metrics
 
 ###
+### Profane word - lowercase
+POST {{host}}/api/validate_chirp
+Content-Type: application/json
+
+{"body": "I had a kerfuffle at the store"}
+
+### Profane word - mixed case
+POST {{host}}/api/validate_chirp
+Content-Type: application/json
+
+{"body": "This Sharbert is delicious"}
+
+### Multiple profane words
+POST {{host}}/api/validate_chirp
+Content-Type: application/json
+
+{"body": "A kerfuffle about sharbert and fornax"}
+
+### No profane words
+POST {{host}}/api/validate_chirp
+Content-Type: application/json
+
+{"body": "What a wonderful day"}
+
+### All profane words
+POST {{host}}/api/validate_chirp
+Content-Type: application/json
+
+{"body": "kerfuffle sharbert fornax"}
