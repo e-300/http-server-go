@@ -1,19 +1,34 @@
 package main
 
 import (
-	"net/http"
-	"sync/atomic"
+	"database/sql"
 	"log"
+	"net/http"
+	"os"
+	"sync/atomic"
+
+	"github.com/e-300/http-server-go/internal/database"
+	"github.com/joho/godotenv"
+	_ "github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 // Stateful handler to track number of requests that have been processed since t-0
 // atomic.Int32 -> safely increment and read int val across multiple goroutines or https requests
 type apiConfig struct{
 	fileserverHits atomic.Int32
+	db 			   *database.Queries 
 }
 
 func main(){
-
+	godotenv.Load()
+	dbURL := os.Getenv("DB_URL")
+	
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil{
+		log.Fatal("DataBase failed to open", err)
+	}
+	dbQueries := database.New(db)
 	const filePathRoot = "."
 	const port = "8080"
 
@@ -21,6 +36,7 @@ func main(){
 	// State Object created
 	apiCfg := apiConfig{
 		fileserverHits: atomic.Int32{},
+		db : dbQueries,	
 	}
 
 	// NewServeMux -> lookup table matching incoming request -> endpoint -> Handler
