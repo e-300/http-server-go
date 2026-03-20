@@ -13,6 +13,7 @@ import (
 	"github.com/e-300/http-server-go/internal/database"
 	"github.com/joho/godotenv"
 	"github.com/google/uuid"
+	_ "github.com/lib/pq"
 )
 
 // Stateful handler to track number of requests that have been processed since t-0
@@ -20,6 +21,7 @@ import (
 type apiConfig struct{
 	fileserverHits atomic.Int32
 	db 			   *database.Queries 
+	platform	string
 }
 
 type User struct {
@@ -32,6 +34,7 @@ type User struct {
 func main(){
 	godotenv.Load()
 	dbURL := os.Getenv("DB_URL")
+	platform := os.Getenv("PLATFORM")
 	
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil{
@@ -46,6 +49,7 @@ func main(){
 	apiCfg := apiConfig{
 		fileserverHits: atomic.Int32{},
 		db : dbQueries,	
+		platform: platform,
 	}
 
 	// NewServeMux -> lookup table matching incoming request -> endpoint -> Handler
@@ -58,7 +62,9 @@ func main(){
 
 	mux.Handle("/app/", wrappedHandler)
 	mux.HandleFunc("GET /admin/metrics", apiCfg.numOfHits)
+
 	mux.HandleFunc("POST /admin/reset", apiCfg.resetHits)
+
 	mux.HandleFunc("GET /api/healthz", handlerReadiness)
 	mux.HandleFunc("POST /api/validate_chirp", handlerChirpsValidate)
 
