@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"os"
 	"sync/atomic"
+	"time"
+
+
 
 	"github.com/e-300/http-server-go/internal/database"
 	"github.com/joho/godotenv"
-	_ "github.com/joho/godotenv"
-	_ "github.com/lib/pq"
+	"github.com/google/uuid"
 )
 
 // Stateful handler to track number of requests that have been processed since t-0
@@ -18,6 +20,13 @@ import (
 type apiConfig struct{
 	fileserverHits atomic.Int32
 	db 			   *database.Queries 
+}
+
+type User struct {
+	ID        uuid.UUID `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Email     string    `json:"email"`
 }
 
 func main(){
@@ -52,6 +61,8 @@ func main(){
 	mux.HandleFunc("POST /admin/reset", apiCfg.resetHits)
 	mux.HandleFunc("GET /api/healthz", handlerReadiness)
 	mux.HandleFunc("POST /api/validate_chirp", handlerChirpsValidate)
+
+	mux.HandleFunc("POST /api/users" , apiCfg.handlerCreateUser)
 
 	// added pointer to server
 	server := &http.Server{
