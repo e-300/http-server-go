@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"time"
 )
 
 
@@ -16,13 +15,13 @@ func (cfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request){
 		Email string `json:"email"`
 	}
 
-	type responseBody struct {
-		Id string `json:"id"`
-		Created_at time.Time `json:"created_at"`
-		Updated_at time.Time `json:"updated_at"`
-		Email string `json:"email"`
-	}
-
+	// type responseBody struct {
+		// Id string `json:"id"`
+		// Created_at time.Time `json:"created_at"`
+		// Updated_at time.Time `json:"updated_at"`
+		// Email string `json:"email"`
+	// }
+	
 	// Reading raw JSON bytes from request 
 	dat, err := io.ReadAll(r.Body)
 	if err != nil{
@@ -49,11 +48,20 @@ func (cfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request){
 		log.Println(err)
 		respondWithError(w, 500, "something went wrong broski")
 	}
-
-	respondWithJSON(w, 201, responseBody{
-		Id: user.ID.String(),
-		Created_at: user.CreatedAt,
-		Updated_at: user.UpdatedAt,
+	
+	respondWithJSON(w, 201, User{
+		ID: user.ID,      
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
 		Email: user.Email,
 	})
+
+
+
+	// respondWithJSON(w, 201, responseBody{
+	// 	Id: user.ID.String(),
+	// 	Created_at: user.CreatedAt,
+	// 	Updated_at: user.UpdatedAt,
+	// 	Email: user.Email,
+	// })
 }
