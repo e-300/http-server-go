@@ -65,10 +65,18 @@ func main(){
 
 	mux.HandleFunc("POST /admin/reset", apiCfg.resetHits)
 
+	// 
 	mux.HandleFunc("GET /api/healthz", handlerReadiness)
+
+	// Validate Chirp length
 	mux.HandleFunc("POST /api/validate_chirp", handlerChirpsValidate)
 
+	// Create user 
 	mux.HandleFunc("POST /api/users" , apiCfg.handlerCreateUser)
+
+	// Create Chirp
+	mux.HandleFunc("POST /api/chirps", createChirp)
+
 
 	// added pointer to server
 	server := &http.Server{
@@ -81,5 +89,6 @@ func main(){
 	log.Fatal(server.ListenAndServe())
 
 }
+
 
 
