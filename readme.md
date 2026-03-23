@@ -1,5 +1,11 @@
+This is an http server built in go emulating twitter
+Im calling it chirpy instead 
+
+
 
 Just documenting the patterns and knowledge im learning for my personal record as this is my first project with go.
+
+
 
 ## HTTP Server Architecture
     1. TCP Listener
