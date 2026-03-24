@@ -31,6 +31,7 @@ type User struct {
 	Email     string    `json:"email"`
 }
 
+
 func main(){
 	godotenv.Load()
 	dbURL := os.Getenv("DB_URL")
@@ -75,7 +76,7 @@ func main(){
 	mux.HandleFunc("POST /api/users" , apiCfg.handlerCreateUser)
 
 	// Create Chirp
-	mux.HandleFunc("POST /api/chirps", createChirp)
+	mux.HandleFunc("POST /api/chirps", apiCfg.createChirp)
 
 
 	// added pointer to server
