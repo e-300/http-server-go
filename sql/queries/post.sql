@@ -15,3 +15,8 @@ DELETE FROM posts;
 -- name: GetAllChirps :many
 SELECT * FROM posts
 ORDER BY created_at;
+
+
+-- name: GetChirp :one
+SELECT * FROM POSTS 
+WHERE id = $1;
