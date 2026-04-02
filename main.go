@@ -81,6 +81,9 @@ func main(){
 	// Get all chirps 
 	mux.HandleFunc("GET /api/chirps", apiCfg.getAllChirps)
 
+	// Get single chirp 
+	mux.HandleFunc("GET /api/chirps/{chirpID}", apiCfg.getChirp)	
+
 	// added pointer to server
 	server := &http.Server{
 		Addr: ":" + port,
