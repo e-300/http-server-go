@@ -11,3 +11,7 @@ RETURNING *;
 
 -- name: DeleteAllPosts :exec
 DELETE FROM posts;
+
+-- name: GetAllChirps :many
+SELECT * FROM posts
+ORDER BY created_at;
