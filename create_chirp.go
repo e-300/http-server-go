@@ -10,7 +10,14 @@ import (
 	"github.com/e-300/http-server-go/internal/database"
 )
 
+type Chirp struct {
+	ID        uuid.UUID `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Body      string	`json:"body"`
+	UserID    uuid.NullUUID `json:"user_id"`
 
+}
 
 func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 	defer r.Body.Close()
@@ -19,14 +26,7 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 		User_id string `json:"user_id"`
 	}
 
-	type responseBody struct {
-		ID        uuid.UUID `json:"id"`
-		CreatedAt time.Time `json:"created_at"`
-		UpdatedAt time.Time `json:"updated_at"`
-		Body      string	`json:"body"`
-		UserID    uuid.NullUUID `json:"user_id"`
 
-	}
 	
 	// Reading raw JSON bytes from request 
 	dat, err := io.ReadAll(r.Body)
@@ -84,7 +84,7 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 		return
 	}
 	
-	respondWithJSON(w, 201, responseBody{
+	respondWithJSON(w, 201, Chirp{
 		ID: post.ID,      	
 		CreatedAt: post.CreatedAt,
 		UpdatedAt: post.UpdatedAt,
