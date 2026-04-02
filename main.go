@@ -78,6 +78,8 @@ func main(){
 	// Create Chirp
 	mux.HandleFunc("POST /api/chirps", apiCfg.createChirp)
 
+	// Get all chirps 
+	mux.HandleFunc("GET /api/chirps", apiCfg.getAllChirps)
 
 	// added pointer to server
 	server := &http.Server{
