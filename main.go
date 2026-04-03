@@ -82,7 +82,10 @@ func main(){
 	mux.HandleFunc("GET /api/chirps", apiCfg.getAllChirps)
 
 	// Get single chirp 
-	mux.HandleFunc("GET /api/chirps/{chirpID}", apiCfg.getChirp)	
+	mux.HandleFunc("GET /api/chirps/{chirpID}", apiCfg.getChirp)
+	
+	// Login endpoint
+	mux.HandleFunc("POST /api/login", apiCfg.handlerUserLogin)
 
 	// added pointer to server
 	server := &http.Server{

@@ -5,6 +5,9 @@ import (
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/e-300/http-server-go/internal/database"
+	"github.com/e-300/http-server-go/internal/database/auth"
 )
 
 
@@ -13,6 +16,7 @@ func (cfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request){
 
 	type requestBody struct{
 		Email string `json:"email"`
+		Password  string    `json:"password"`
 	}
 
 	// type responseBody struct {
@@ -42,8 +46,16 @@ func (cfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request){
 		}
 		return 
 	}
-	
-	user, err := cfg.db.CreateUser(r.Context(), params.Email)
+	hash, err := auth.HashPassword(params.Password)
+	if err != nil{
+		log.Print(err)
+		return
+	}
+
+	user, err := cfg.db.CreateUser(r.Context(), database.CreateUserParams{
+		Email: params.Email,
+		HashedPassword: hash,
+	})
 	if err != nil{
 		log.Println(err)
 		respondWithError(w, 500, "something went wrong broski")
