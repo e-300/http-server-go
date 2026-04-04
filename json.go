@@ -8,9 +8,9 @@ import (
 
 // JSON request helper functions 
 func respondWithError(w http.ResponseWriter, code int, msg string, err error) error{
-	return respondWithJSON(w, code, map[string]string{"error" : msg})
+	return respondWithJSON(w, code, map[string]string{"error" : msg}, err)
 }
-func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) error{
+func respondWithJSON(w http.ResponseWriter, code int, payload interface{}, err error) error{
 	// Serlizing payload into json byte slice
 	response, err := json.Marshal(payload)
 	if err != nil{
