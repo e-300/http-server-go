@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"net/http"
-	"log"
 	"io"
 	"strings"
 )
@@ -45,10 +44,7 @@ func handlerChirpsValidate(w http.ResponseWriter, r *http.Request) {
 	// Reading raw JSON bytes from request 
 	dat, err := io.ReadAll(r.Body)
 	if err != nil{
-		err := respondWithError(w, 500, "Something went wrong", err)
-		if err != nil{
-			log.Println(err)
-		}
+		respondWithError(w, 500, "Something went wrong", err)
 		return 
 	}
 	
@@ -56,10 +52,7 @@ func handlerChirpsValidate(w http.ResponseWriter, r *http.Request) {
 	params := requestBody{}
 	err = json.Unmarshal(dat, &params)
 	if err != nil{
-		err := respondWithError(w, 500, "Something went wrong", err)
-		if err != nil{
-			log.Println(err)
-		}
+		respondWithError(w, 500, "Something went wrong", err)
 		return 
 	}
 
@@ -67,16 +60,13 @@ func handlerChirpsValidate(w http.ResponseWriter, r *http.Request) {
 
 	requestMsg := params.Msg
 	if len(requestMsg) > 140{
-		err := respondWithError(w, 400, "Chirp is too long", err)
-		if err != nil{
-			log.Println(err)
-		}
+		respondWithError(w, 400, "Chirp is too long", err)
 		return 
 	}
 	res := profaneWords(requestMsg)
 	respondWithJSON(w, 200, responseBody{
 		Valid: true,
 		CleanedBody: res,
-	}, nil)
+	},)
 
 }

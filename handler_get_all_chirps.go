@@ -11,7 +11,7 @@ func (cfg *apiConfig) getAllChirps(w http.ResponseWriter, r *http.Request){
 	
 	allChirps, err := cfg.db.GetAllChirps(r.Context())
 	if err != nil{
-		respondWithError(w, http.StatusInternalServerError, "Couldn't get all chirps from database", err)
+		respondWithError(w, http.StatusInternalServerError, "Couldn't get all chirps from database /ncomon mayn", err)
 		return
 	}
 
@@ -29,5 +29,5 @@ func (cfg *apiConfig) getAllChirps(w http.ResponseWriter, r *http.Request){
 
 
 	
-	respondWithJSON(w, http.StatusOK, responseChirps, nil)
+	respondWithJSON(w, http.StatusOK, responseChirps)
 }

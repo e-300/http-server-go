@@ -31,10 +31,7 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 	// Reading raw JSON bytes from request 
 	dat, err := io.ReadAll(r.Body)
 	if err != nil{
-		err := respondWithError(w, 500, "Something went wrong", err)
-		if err != nil{
-			log.Println(err)
-		}
+		respondWithError(w, 500, "Something went wrong broski", err)
 		return 
 	}
 	
@@ -42,19 +39,13 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 	params := requestBody{}
 	err = json.Unmarshal(dat, &params)
 	if err != nil{
-		err := respondWithError(w, 500, "Something went wrong", err)
-		if err != nil{
-			log.Println(err)
-		}
+		respondWithError(w, 500, "Something went wrong broski", err)
 		return 
 	}
 
 	requestMsg := params.Msg
 	if len(requestMsg) > 140{
-		err := respondWithError(w, 400, "Chirp is too long", err)
-		if err != nil{
-			log.Println(err)
-		}
+		respondWithError(w, 400, "Chirp is too long dawg", err)
 		return 
 	}
 	res := profaneWords(requestMsg)
@@ -90,5 +81,5 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 		UpdatedAt: post.UpdatedAt,
  		Body: post.Body,
  		UserID: post.UserID,
-	}, nil)   
+	})   
 }

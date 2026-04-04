@@ -28,6 +28,6 @@ func (cfg *apiConfig) getChirp(w http.ResponseWriter, r *http.Request){
 			UpdatedAt: getChirp.UpdatedAt,	
 			Body: getChirp.Body,     	
 			UserID: getChirp.UserID,
-		}, nil)
+		})
 	
 }
