@@ -3,24 +3,33 @@ package main
 import (
 	"net/http"
 	"encoding/json"
+	"log"
 
 )
 
-// JSON request helper functions 
-func respondWithError(w http.ResponseWriter, code int, msg string, err error) error{
-	return respondWithJSON(w, code, map[string]string{"error" : msg}, err)
-}
-func respondWithJSON(w http.ResponseWriter, code int, payload interface{}, err error) error{
-	// Serlizing payload into json byte slice
-	response, err := json.Marshal(payload)
-	if err != nil{
-		return err
+func respondWithError(w http.ResponseWriter, code int, msg string, err error) {
+	if err != nil {
+		log.Println(err)
 	}
-	// Telling Client we are sending back a json response
+	if code > 499 {
+		log.Printf("Responding with 5XX error: %s", msg)
+	}
+	type errorResponse struct {
+		Error string `json:"error"`
+	}
+	respondWithJSON(w, code, errorResponse{
+		Error: msg,
+	})
+}
+
+func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
-	// Cors header allowing any origin allowed to recieve this response
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	dat, err := json.Marshal(payload)
+	if err != nil {
+		log.Printf("Error marshalling JSON: %s", err)
+		w.WriteHeader(500)
+		return
+	}
 	w.WriteHeader(code)
-	w.Write(response)
-	return nil
+	w.Write(dat)
 }
