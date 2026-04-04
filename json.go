@@ -7,7 +7,7 @@ import (
 )
 
 // JSON request helper functions 
-func respondWithError(w http.ResponseWriter, code int, msg string) error{
+func respondWithError(w http.ResponseWriter, code int, msg string, err error) error{
 	return respondWithJSON(w, code, map[string]string{"error" : msg})
 }
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) error{
