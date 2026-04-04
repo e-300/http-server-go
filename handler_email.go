@@ -19,12 +19,6 @@ func (cfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request){
 		Password  string    `json:"password"`
 	}
 
-	// type responseBody struct {
-		// Id string `json:"id"`
-		// Created_at time.Time `json:"created_at"`
-		// Updated_at time.Time `json:"updated_at"`
-		// Email string `json:"email"`
-	// }
 	
 	// Reading raw JSON bytes from request 
 	dat, err := io.ReadAll(r.Body)
@@ -68,12 +62,4 @@ func (cfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request){
 		Email: user.Email,
 	})
 
-
-
-	// respondWithJSON(w, 201, responseBody{
-	// 	Id: user.ID.String(),
-	// 	Created_at: user.CreatedAt,
-	// 	Updated_at: user.UpdatedAt,
-	// 	Email: user.Email,
-	// })
 }
