@@ -14,9 +14,9 @@ func HashPassword(password string) (string, error){
 }
 // Compare the pw in HTTP request with the password that is stored in the database
 func CheckPasswordHash(password, hash string) (bool, error){
-	b , err := argon2id.ComparePasswordAndHash(password, hash)
+	match , err := argon2id.ComparePasswordAndHash(password, hash)
 	if err != nil{
 		return false, err
 	}
-	return b, nil
+	return match, nil
 }

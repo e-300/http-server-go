@@ -5,4 +5,6 @@ import (
 	"time"
 )
 
-func MakeJWT(userID uuid.UUID, tokenSecret string, expiresIn time.Duration) (string, error)
+func MakeJWT(userID uuid.UUID, tokenSecret string, expiresIn time.Duration) (string, error){
+	return "",nil
+}
