@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"log"
 
 	"github.com/alexedwards/argon2id"
 )
