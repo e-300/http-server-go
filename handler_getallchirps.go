@@ -1,7 +1,7 @@
 package main
 
 import (
-	//"encoding/json"
+
 	"net/http"
 )
 
@@ -27,11 +27,7 @@ func (cfg *apiConfig) getAllChirps(w http.ResponseWriter, r *http.Request){
 		})
 	}
 
-	// marshalledChirps, err := json.Marshal(responseChirps)
-	// if err != nil{
-	// 	respondWithError(w, http.StatusInternalServerError, "coudnt marshall chirps")
-	// 	return		
-	// }
+
 	
 	respondWithJSON(w, http.StatusOK, responseChirps)
 }

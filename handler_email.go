@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-
 	"github.com/e-300/http-server-go/internal/database"
 	"github.com/e-300/http-server-go/internal/database/auth"
 )
