@@ -6,13 +6,9 @@ import (
 	"net/http"
 	"os"
 	"sync/atomic"
-	"time"
-
-
 
 	"github.com/e-300/http-server-go/internal/database"
 	"github.com/joho/godotenv"
-	"github.com/google/uuid"
 	_ "github.com/lib/pq"
 )
 
@@ -21,16 +17,8 @@ import (
 type apiConfig struct{
 	fileserverHits atomic.Int32
 	db 			   *database.Queries 
-	platform	string
+	platform	   string
 }
-
-type User struct {
-	ID        uuid.UUID `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Email     string    `json:"email"`
-}
-
 
 func main(){
 	godotenv.Load()
@@ -62,11 +50,12 @@ func main(){
 	wrappedHandler := apiCfg.middlewareMetricsInc(fsHandler)
 
 	mux.Handle("/app/", wrappedHandler)
+
 	mux.HandleFunc("GET /admin/metrics", apiCfg.numOfHits)
 
+	// reset metric hits 
 	mux.HandleFunc("POST /admin/reset", apiCfg.resetHits)
 
-	// 
 	mux.HandleFunc("GET /api/healthz", handlerReadiness)
 
 	// Validate Chirp length
