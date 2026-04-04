@@ -14,6 +14,9 @@ func (cfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request){
 		Email string `json:"email"`
 		Password  string    `json:"password"`
 	}
+	type response struct {
+		User
+	}
 
 	decoder := json.NewDecoder(r.Body)
 
@@ -33,24 +36,19 @@ func (cfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request){
 
 	}
 
-	b , err := auth.CheckPasswordHash(params.Password, user.HashedPassword)
-	if err != nil{
+	match , err := auth.CheckPasswordHash(params.Password, user.HashedPassword)
+	if err != nil || !match{
 		respondWithError(w, 401, "Incorrect email or password", err)
 		return		
 	}
 
-	if !b{
-		respondWithError(w, 401, "Incorrect email or password", err)
-		return
-	}
-
-
-	respondWithJSON(w, 200, User{
-		ID: user.ID,
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
-		Email: user.Email,
-	})
+	respondWithJSON(w, 200, response{
+		User{
+			ID: user.ID,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
+			Email: user.Email,
+	}})
 
 
 }
