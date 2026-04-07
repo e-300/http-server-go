@@ -50,12 +50,14 @@ func (cfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request){
 		signedToken, err = auth.MakeJWT(user.ID, cfg.token_string, time.Hour,)
 		if err != nil{
 			respondWithError(w, 401, "Token Could not be signed", err)
+			return
 		}
 
 	}else{
-		signedToken, err = auth.MakeJWT(user.ID, cfg.token_string, time.Duration(*params.Expires_in_seconds))
+		signedToken, err = auth.MakeJWT(user.ID, cfg.token_string, time.Duration(*params.Expires_in_seconds) * time.Second)
 		if err != nil{
 			respondWithError(w, 401, "Token Could not be signed", err)
+			return
 		}	
 	}
 
