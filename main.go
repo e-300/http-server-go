@@ -18,12 +18,14 @@ type apiConfig struct{
 	fileserverHits atomic.Int32
 	db 			   *database.Queries 
 	platform	   string
+	token_string   string
 }
 
 func main(){
 	godotenv.Load()
 	dbURL := os.Getenv("DB_URL")
 	platform := os.Getenv("PLATFORM")
+	token_string := os.Getenv("TOKEN_STRING")
 	
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil{
@@ -39,6 +41,7 @@ func main(){
 		fileserverHits: atomic.Int32{},
 		db : dbQueries,	
 		platform: platform,
+		token_string: token_string,
 	}
 
 	// NewServeMux -> lookup table matching incoming request -> endpoint -> Handler
