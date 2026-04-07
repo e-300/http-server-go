@@ -7,17 +7,25 @@ import (
 )
 
 
+type jwtClaim struct{
+	jwt.RegisteredClaims
+}
+
+
 func MakeJWT(userID uuid.UUID, tokenSecret string, expiresIn time.Duration) (string, error){
 	
 	now := time.Now().UTC()
-	
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
-		Issuer: "chirpy-access",
-		IssuedAt: jwt.NewNumericDate(now),
-		ExpiresAt:  jwt.NewNumericDate(now.Add(expiresIn)),
-		Subject: userID.String(),
 
-	})
+	regisClaim := jwtClaim{
+		jwt.RegisteredClaims{
+			Issuer: "chirpy-access",
+			IssuedAt: jwt.NewNumericDate(now),
+			ExpiresAt:  jwt.NewNumericDate(now.Add(expiresIn)),
+			Subject: userID.String(),
+		},
+	}
+	
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &regisClaim)
 
 	bytetoken := []byte(tokenSecret)
 	signedtoken, err := token.SignedString(bytetoken)
