@@ -1,13 +1,15 @@
 package main
 
 import (
-	"net/http"
-	"log"
-	"io"
 	"encoding/json"
+	"io"
+	"log"
+	"net/http"
 	"time"
-	"github.com/google/uuid"
+
+	"github.com/e-300/http-server-go/internal/auth"
 	"github.com/e-300/http-server-go/internal/database"
+	"github.com/google/uuid"
 )
 
 type Chirp struct {
@@ -26,8 +28,6 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 		User_id string `json:"user_id"`
 	}
 
-
-	
 	// Reading raw JSON bytes from request 
 	dat, err := io.ReadAll(r.Body)
 	if err != nil{
@@ -42,6 +42,21 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 		respondWithError(w, 500, "Something went wrong broski", err)
 		return 
 	}
+
+	// Checking if user is authenticated 
+	
+	token, err := auth.GetBearerToken(r.Header)
+	if err != nil{
+		respondWithError(w, 500, "Something wrong with Bearer", err)
+		return 	
+	}
+
+	uid, err := auth.ValidateJWT(token, cfg.token_string)
+	if err != nil{
+		respondWithError(w, 500, "Something went wrong when validating", err)
+		return 
+	}
+
 
 	requestMsg := params.Msg
 	if len(requestMsg) > 140{
@@ -58,10 +73,17 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
+	if uid != parsedUid{
+		respondWithError(w, 401, "Authentication Could not be established", err)
+		return
+	}
+
 	cleanUid := uuid.NullUUID{
-		UUID: parsedUid,
+		UUID: uid,
 		Valid: true,
 	}
+
+
 
 	postParams := database.CreatePostParams{
 		Body: res,
@@ -80,6 +102,6 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 		CreatedAt: post.CreatedAt,
 		UpdatedAt: post.UpdatedAt,
  		Body: post.Body,
- 		UserID: post.UserID,
+ 		UserID: cleanUid,
 	})   
 }
