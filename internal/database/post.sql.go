@@ -25,7 +25,7 @@ RETURNING id, created_at, updated_at, body, user_id
 
 type CreatePostParams struct {
 	Body   string
-	UserID uuid.NullUUID
+	UserID uuid.UUID
 }
 
 func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, error) {

@@ -15,7 +15,7 @@ type Post struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Body      string
-	UserID    uuid.NullUUID
+	UserID    uuid.UUID
 }
 
 type User struct {
