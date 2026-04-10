@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"sync/atomic"
-
 	"github.com/e-300/http-server-go/internal/database"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"

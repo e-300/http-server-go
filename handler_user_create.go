@@ -22,7 +22,7 @@ func (cfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request){
 	defer r.Body.Close()
 
 	type parameters struct{
-		Email string `json:"email"`
+		Email string 		`json:"email"`
 		Password  string    `json:"password"`
 	}
 

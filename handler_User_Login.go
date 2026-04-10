@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
-
 	"github.com/e-300/http-server-go/internal/auth"
 )
 
@@ -13,8 +12,8 @@ func (cfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request){
 	defer r.Body.Close()
 
 	type parameters struct{
-		Email string `json:"email"`
-		Password  string    `json:"password"`
+		Email string 			`json:"email"`
+		Password  string 	    `json:"password"`
 		Expires_in_seconds *int `json:"expires_in_seconds"`
 	}
 	type response struct {
