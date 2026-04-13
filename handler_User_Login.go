@@ -4,7 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
+
+	//"database/sql"
+
 	"github.com/e-300/http-server-go/internal/auth"
+	"github.com/e-300/http-server-go/internal/database"
+	//"github.com/e-300/http-server-go/internal/database"
 )
 
 
@@ -12,20 +17,19 @@ func (cfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request){
 	defer r.Body.Close()
 
 	type parameters struct{
-		Email string 			`json:"email"`
-		Password  string 	    `json:"password"`
-		Expires_in_seconds *int `json:"expires_in_seconds"`
+		Email string 			  `json:"email"`
+		Password  string 	      `json:"password"`
+		// Token			string 	  `json:"token"`
+		// RefreshToken	string    `json:"refresh_token"`
+
 	}
 	type response struct {
 		User
 	}
 
 	decoder := json.NewDecoder(r.Body)
-
 	params := parameters{}
-
 	err := decoder.Decode(&params)
-
 	if err != nil {
 		respondWithError(w, 401, "Couldn't decode parameters", err)
 		return
@@ -44,21 +48,48 @@ func (cfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request){
 		return		
 	}
 
-	signedToken := ""
-	if (params.Expires_in_seconds == nil) || (*params.Expires_in_seconds > 3600){
-		signedToken, err = auth.MakeJWT(user.ID, cfg.token_string, time.Hour,)
-		if err != nil{
-			respondWithError(w, 401, "Token Could not be signed", err)
-			return
-		}
-
-	}else{
-		signedToken, err = auth.MakeJWT(user.ID, cfg.token_string, time.Duration(*params.Expires_in_seconds) * time.Second)
-		if err != nil{
-			respondWithError(w, 401, "Token Could not be signed", err)
-			return
-		}	
+	
+	signedAccessToken, err := auth.MakeJWT(user.ID, cfg.token_string, time.Hour)
+	if err != nil{
+		respondWithError(w, 401, "Access Token Signing Issue", err)
+		return
 	}
+
+
+	// dbRefreshToken, err := cfg.db.GetRefreshToken(r.Context(), signedAccessToken)
+	// if err != nil{
+	// 	respondWithError(w, 401, "Refresh Token for this user is not in DB", err)
+	// 	return
+	// }
+
+	// // check refresh token revoked or not 
+	// // if revoked at == null then issue new 
+
+	// if dbRefreshToken.RevokedAt != sql.NullTime
+
+	// if params.RefreshToken != dbRefreshToken.Token{
+	// 	respondWithError(w, 401, "")
+
+	// }
+
+
+
+	// creating new refresh token
+	refreshToken, err := auth.MakeRefreshToken()
+	if err != nil{
+		respondWithError(w, 401, "Access Token Signing Issue", err)
+		return
+	}
+
+	_, err = cfg.db.CreateRefresh(r.Context(), database.CreateRefreshParams{
+		Token: refreshToken,
+		UserID: user.ID, 
+	})
+	if err != nil{
+		respondWithError(w, 401, "Refresh Token could not be inserted into DB", err)
+		return
+	}
+
 
 	respondWithJSON(w, 200, response{
 		User{
@@ -66,8 +97,8 @@ func (cfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request){
 			CreatedAt: user.CreatedAt,
 			UpdatedAt: user.UpdatedAt,
 			Email: user.Email,
-			Token: signedToken,
+			Token: signedAccessToken,
+			RefreshToken: refreshToken,
 	}})
-
 
 }

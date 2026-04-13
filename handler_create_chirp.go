@@ -45,16 +45,18 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 		fmt.Fprintln(w,params.User_id)
 		return 	
 	}
+	
+	log.Printf("DEBUG raw token: %q", token) 
 
 	validatedUid, err := auth.ValidateJWT(token, cfg.token_string)
 	if err != nil{
-		respondWithError(w, 500, "Something went wrong when validating", err)
+		respondWithError(w, 401, "Something went wrong when validating", err)
 		return 
 	}
 
 	requestMsg := params.Msg
 	if len(requestMsg) > 140{
-		respondWithError(w, 400, "Chirp is too long dawg", err)
+		respondWithError(w, 401, "Chirp is too long dawg", err)
 		return 
 	}
 	cleanedMsg := profaneWords(requestMsg)
