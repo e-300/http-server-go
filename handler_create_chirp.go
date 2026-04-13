@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	//"io"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
+
 	"github.com/e-300/http-server-go/internal/auth"
 	"github.com/e-300/http-server-go/internal/database"
 	"github.com/google/uuid"
@@ -35,35 +36,21 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	// // Reading raw JSON bytes from request 
-	// dat, err := io.ReadAll(r.Body)
-	// if err != nil{
-	// 	respondWithError(w, 500, "Something went wrong broski", err)
-	// 	return 
-	// }
-	
-	// // Raw bytes Mapped into request struct 
-	// params := requestBody{}
-	// err = json.Unmarshal(dat, &params)
-	// if err != nil{
-	// 	respondWithError(w, 500, "Something went wrong broski", err)
-	// 	return 
-	// }
-
 	// Checking if user is authenticated 
 	
 	token, err := auth.GetBearerToken(r.Header)
 	if err != nil{
 		respondWithError(w, 500, "Something wrong with Bearer", err)
+		fmt.Fprintln(w,token)
+		fmt.Fprintln(w,params.User_id)
 		return 	
 	}
 
-	uid, err := auth.ValidateJWT(token, cfg.token_string)
+	validatedUid, err := auth.ValidateJWT(token, cfg.token_string)
 	if err != nil{
 		respondWithError(w, 500, "Something went wrong when validating", err)
 		return 
 	}
-
 
 	requestMsg := params.Msg
 	if len(requestMsg) > 140{
@@ -72,29 +59,10 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 	}
 	cleanedMsg := profaneWords(requestMsg)
 
-	reqUid := params.User_id
-	
-	parsedUid, err := uuid.Parse(reqUid)
-	if err != nil{
-		log.Println(err)
-		return
-	}
-
-	if uid != parsedUid{
-		respondWithError(w, 401, "Authentication Could not be established", err)
-		return
-	}
-
-	// cleanUid := uuid.NullUUID{
-	// 	UUID: uid,
-	// 	Valid: true,
-	// }
-
-
 
 	postParams := database.CreatePostParams{
 		Body: cleanedMsg,
-		UserID: parsedUid,
+		UserID: validatedUid,
 
 	}
 
@@ -109,6 +77,6 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 		CreatedAt: post.CreatedAt,
 		UpdatedAt: post.UpdatedAt,
  		Body: post.Body,
- 		//UserID: post.UserID,
+ 		UserID: post.UserID,
 	})   
 }
