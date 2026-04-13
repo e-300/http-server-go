@@ -78,6 +78,11 @@ func main(){
 	// Login endpoint
 	mux.HandleFunc("POST /api/login", apiCfg.handlerUserLogin)
 
+	// Refresh end point
+	mux.HandleFunc("POST /api/refresh", apiCfg.handlerRefresh)
+
+	mux.HandleFunc("POST /api/revoke", apiCfg.handlerRevoke)
+
 	// added pointer to server
 	server := &http.Server{
 		Addr: ":" + port,
