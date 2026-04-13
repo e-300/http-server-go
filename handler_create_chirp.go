@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"io"
+	//"io"
 	"log"
 	"net/http"
 	"time"
@@ -16,7 +16,7 @@ type Chirp struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	Body      string	`json:"body"`
-	UserID    uuid.NullUUID `json:"user_id"`
+	UserID    uuid.UUID `json:"user_id"`
 
 }
 
@@ -27,20 +27,28 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 		User_id string `json:"user_id"`
 	}
 
-	// Reading raw JSON bytes from request 
-	dat, err := io.ReadAll(r.Body)
-	if err != nil{
-		respondWithError(w, 500, "Something went wrong broski", err)
-		return 
-	}
-	
-	// Raw bytes Mapped into request struct 
+	decoder := json.NewDecoder(r.Body)
 	params := requestBody{}
-	err = json.Unmarshal(dat, &params)
-	if err != nil{
-		respondWithError(w, 500, "Something went wrong broski", err)
-		return 
+	err := decoder.Decode(&params)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters", err)
+		return
 	}
+
+	// // Reading raw JSON bytes from request 
+	// dat, err := io.ReadAll(r.Body)
+	// if err != nil{
+	// 	respondWithError(w, 500, "Something went wrong broski", err)
+	// 	return 
+	// }
+	
+	// // Raw bytes Mapped into request struct 
+	// params := requestBody{}
+	// err = json.Unmarshal(dat, &params)
+	// if err != nil{
+	// 	respondWithError(w, 500, "Something went wrong broski", err)
+	// 	return 
+	// }
 
 	// Checking if user is authenticated 
 	
@@ -62,7 +70,7 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 		respondWithError(w, 400, "Chirp is too long dawg", err)
 		return 
 	}
-	res := profaneWords(requestMsg)
+	cleanedMsg := profaneWords(requestMsg)
 
 	reqUid := params.User_id
 	
@@ -77,16 +85,16 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	cleanUid := uuid.NullUUID{
-		UUID: uid,
-		Valid: true,
-	}
+	// cleanUid := uuid.NullUUID{
+	// 	UUID: uid,
+	// 	Valid: true,
+	// }
 
 
 
 	postParams := database.CreatePostParams{
-		Body: res,
-		UserID: cleanUid,
+		Body: cleanedMsg,
+		UserID: parsedUid,
 
 	}
 
@@ -101,6 +109,6 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 		CreatedAt: post.CreatedAt,
 		UpdatedAt: post.UpdatedAt,
  		Body: post.Body,
- 		UserID: cleanUid,
+ 		//UserID: post.UserID,
 	})   
 }

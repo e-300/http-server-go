@@ -6,27 +6,28 @@ import (
 	"github.com/google/uuid"
 )
 
-func (cfg *apiConfig) getChirp(w http.ResponseWriter, r *http.Request){
+func (cfg *apiConfig) handlerChirpGet(w http.ResponseWriter, r *http.Request){
 	defer r.Body.Close()
 
 	
-	chirp, err := uuid.Parse(r.PathValue("chirpID"))
+	chirpId, err := uuid.Parse(r.PathValue("chirpID"))
 	if err != nil{
 		respondWithError(w, 400, "Couldn't find or parse chirp id", err)
 		return
 	}
 
-	getChirp, err := cfg.db.GetChirp(r.Context(), chirp)
+	dbChirp, err := cfg.db.GetChirp(r.Context(), chirpId)
 	if err != nil{
 		respondWithError(w, 404, "Chirp not found", err)
+		return
 	}
 
 	respondWithJSON(w, 200, Chirp{
-			ID: getChirp.ID,
-			CreatedAt: getChirp.CreatedAt,
-			UpdatedAt: getChirp.UpdatedAt,	
-			Body: getChirp.Body,     	
-			UserID: getChirp.UserID,
+			ID: dbChirp.ID,
+			CreatedAt: dbChirp.CreatedAt,
+			UpdatedAt: dbChirp.UpdatedAt,	
+			Body: dbChirp.Body,     	
+			//UserID: dbChirp.UserID,
 		})
 	
 }
