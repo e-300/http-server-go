@@ -1,9 +1,9 @@
 package auth
 
 import (
+	"net/http"
 	"testing"
 	"time"
-	"net/http"
 	"github.com/google/uuid"
 )
 
