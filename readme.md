@@ -1,7 +1,7 @@
 This is an http server built in go emulating twitter
 Im calling it chirpy instead...
 
-
+Project isnt anywhere near where I want it and the code quality, naming conventions and certain algos used in the code need to be optimized, 
 
 Just documenting the patterns and knowledge im learning for my personal record as this is my first project with go.
 
