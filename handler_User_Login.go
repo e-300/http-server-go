@@ -56,22 +56,6 @@ func (cfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request){
 	}
 
 
-	// dbRefreshToken, err := cfg.db.GetRefreshToken(r.Context(), signedAccessToken)
-	// if err != nil{
-	// 	respondWithError(w, 401, "Refresh Token for this user is not in DB", err)
-	// 	return
-	// }
-
-	// // check refresh token revoked or not 
-	// // if revoked at == null then issue new 
-
-	// if dbRefreshToken.RevokedAt != sql.NullTime
-
-	// if params.RefreshToken != dbRefreshToken.Token{
-	// 	respondWithError(w, 401, "")
-
-	// }
-
 
 
 	// creating new refresh token

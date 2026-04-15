@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"time"
-
 	"github.com/e-300/http-server-go/internal/auth"
 	"github.com/e-300/http-server-go/internal/database"
 	"github.com/google/uuid"
@@ -45,7 +44,7 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
 		fmt.Fprintln(w,params.User_id)
 		return 	
 	}
-	
+
 	log.Printf("DEBUG raw token: %q", token) 
 
 	validatedUid, err := auth.ValidateJWT(token, cfg.token_string)

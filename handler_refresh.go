@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/e-300/http-server-go/internal/auth"
-	//"github.com/e-300/http-server-go/internal/database"
+
 )
 
 func (cfg *apiConfig) handlerRefresh(w http.ResponseWriter, r *http.Request){
