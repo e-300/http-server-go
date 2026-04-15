@@ -3,7 +3,8 @@ package main
 import (
 	"net/http"
 	"github.com/e-300/http-server-go/internal/auth"
-	"time"
+	//"time"
+	//"database/sql"
 )
 
 func (cfg *apiConfig) handlerRevoke(w http.ResponseWriter, r *http.Request){
@@ -22,15 +23,18 @@ func (cfg *apiConfig) handlerRevoke(w http.ResponseWriter, r *http.Request){
 		respondWithError(w, 401, "Token Not in DB", err)
 		return
 	}
-	if dbToken.ExpiresAt.Before(time.Now()) {
-		respondWithError(w, 401, "Token expired", nil)
-		return
-	}
 
 	if dbToken.RevokedAt.Valid {
 		respondWithError(w, 401, "Token revoked", nil)
 		return
 	}
+
+	_, err = cfg.db.SetRevoked(r.Context(), dbToken.Token)
+	if err != nil {
+		respondWithError(w, 401, "Not set to Revoked", err)
+		return
+	}
+
 	
-	respondWithJSON(w, 204, http.NoBody)
+	w.WriteHeader(http.StatusNoContent)
 }

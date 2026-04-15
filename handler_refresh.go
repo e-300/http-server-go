@@ -27,12 +27,18 @@ func (cfg *apiConfig) handlerRefresh(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-
+	// token is expired???
 	if time.Now().After(dbToken.ExpiresAt){
 		respondWithError(w, 401, "Token is Expired", err)
 		return
 	}
 
+	// token is revoked??
+	if dbToken.RevokedAt.Valid == true{
+		respondWithError(w, 401, "Token is Revoked", err)
+		return
+	}
+	// issue new jwt
 	jwt, err := auth.MakeJWT(dbToken.UserID, cfg.token_string, time.Hour)
 	if err != nil{
 		respondWithError(w, 401, "New jwt could not be issued", err)
