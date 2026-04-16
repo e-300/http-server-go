@@ -11,8 +11,19 @@ VALUES (
 RETURNING *;
 
 -- name: DeleteAllRefreshTokens :exec
-DELETE FROM refresh_tokens
+DELETE FROM refresh_tokens;
 
 -- name: GetRefreshToken :one
 SELECT * FROM refresh_tokens
 WHERE token = $1;
+
+-- name: SetRevoked :one
+UPDATE refresh_tokens
+SET revoked_at = NOW(), updated_at = NOW()
+WHERE token = $1
+RETURNING *;
+
+
+
+
+

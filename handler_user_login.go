@@ -55,9 +55,6 @@ func (cfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-
-
-
 	// creating new refresh token
 	refreshToken, err := auth.MakeRefreshToken()
 	if err != nil{

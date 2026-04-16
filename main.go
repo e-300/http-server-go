@@ -83,6 +83,9 @@ func main(){
 
 	mux.HandleFunc("POST /api/revoke", apiCfg.handlerRevoke)
 
+	// 
+	mux.HandleFunc("PUT /api/users", apiCfg.handlerUserLoginInfo)
+
 	// added pointer to server
 	server := &http.Server{
 		Addr: ":" + port,
