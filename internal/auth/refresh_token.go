@@ -1,3 +1,6 @@
+// MakeRefreshToken makes a random 256 bit token
+// encoded in hex
+
 package auth
 
 import (
