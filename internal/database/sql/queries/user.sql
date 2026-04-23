@@ -15,3 +15,10 @@ DELETE FROM users;
 -- name: GetUser :one
 SELECT * FROM users
 WHERE email = $1;
+
+-- name: UpdateUserLogin :one
+UPDATE users 
+SET hashed_password = $2
+WHERE id = $1;
+
+-- name: UpdateEmail :one
