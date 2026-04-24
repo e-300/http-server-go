@@ -83,7 +83,7 @@ func main() {
 	mux.HandleFunc("POST /api/revoke", apiCfg.handlerRevoke)
 
 	// User login end point, allows users to change email and password after auth
-	//mux.HandleFunc("PUT /api/users", apiCfg.handlerUserLoginInfo)
+	mux.HandleFunc("PUT /api/users", apiCfg.handlerUserUpdateLogin)
 
 	// added pointer to server
 	server := &http.Server{
