@@ -12,7 +12,6 @@ func (cfg *apiConfig) handlerUserUpdateLogin(w http.ResponseWriter, r *http.Requ
 	defer r.Body.Close()
 	
 	type parameters struct{
-//		Token		string	`json:"token"`
 		Email		string	`json:"email"`
 		Password	string	`json:"password"`	
 	}
