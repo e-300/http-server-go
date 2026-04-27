@@ -34,7 +34,7 @@ func (cfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := cfg.db.GetUser(r.Context(), params.Email)
+	user, err := cfg.db.GetUserFromEmail(r.Context(), params.Email)
 	if err != nil {
 		respondWithError(w, 401, "Incorrect email or password", err)
 		return

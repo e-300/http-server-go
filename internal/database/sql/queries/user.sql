@@ -12,13 +12,16 @@ RETURNING *;
 -- name: DeleteAllUsers :exec
 DELETE FROM users;
 
--- name: GetUser :one
+-- name: GetUserFromEmail :one
 SELECT * FROM users
 WHERE email = $1;
 
--- name: UpdateUserLogin :one
-UPDATE users 
-SET hashed_password = $2
+-- name: GetUserFromId :one
+SELECT * FROM users
 WHERE id = $1;
 
--- name: UpdateEmail :one
+-- name: UpdateEmailAndPassword :one
+UPDATE users
+SET email = $2, hashed_password = $3
+WHERE id = $1
+RETURNING *;
