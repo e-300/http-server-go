@@ -25,7 +25,7 @@ func (cfg *apiConfig) handlerDeleteChirp(w http.ResponseWriter, r *http.Request)
 	}
 
 
-	chirpId, err := uuid.Parse(r.PathValue("chirpsID"))
+	chirpId, err := uuid.Parse(r.PathValue("chirpID"))
 	if err != nil{
 		respondWithError(w, 403, "Couldn't find or parse chirp id", err)
 		return

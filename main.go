@@ -86,7 +86,7 @@ func main() {
 	mux.HandleFunc("PUT /api/users", apiCfg.handlerUserUpdateLogin)
 
 	// Delete chirp endpoint 
-	mux.HandleFunc("DELETE /api/chirps/{chirpsID}", apiCfg.handlerDeleteChirp)
+	mux.HandleFunc("DELETE /api/chirps/{chirpID}", apiCfg.handlerDeleteChirp)
 
 	// added pointer to server
 	server := &http.Server{
