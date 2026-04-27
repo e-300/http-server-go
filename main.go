@@ -85,6 +85,9 @@ func main() {
 	// User login end point, allows users to change email and password after auth
 	mux.HandleFunc("PUT /api/users", apiCfg.handlerUserUpdateLogin)
 
+	// Delete chirp endpoint 
+	mux.HandleFunc("DELETE /api/chirps/{chirpsID}", apiCfg.handlerDeleteChirp)
+
 	// added pointer to server
 	server := &http.Server{
 		Addr:    ":" + port,
