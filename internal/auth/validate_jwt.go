@@ -6,7 +6,7 @@ import (
 )
 
 func ValidateJWT(tokenString, tokenSecret string) (uuid.UUID, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &jwtClaim{}, func(*jwt.Token)(interface{}, error){
+	token, err := jwt.ParseWithClaims(tokenString, &jwtClaim{}, func(*jwt.Token)(any, error){
 		byteToken := []byte(tokenSecret)
 		return byteToken, nil
 	})
