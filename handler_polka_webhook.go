@@ -1,8 +1,10 @@
 package main
 
-import(
-	"net/http"
+import (
 	"encoding/json"
+	"net/http"
+
+	"github.com/e-300/http-server-go/internal/auth"
 	"github.com/google/uuid"
 )
 
@@ -27,6 +29,13 @@ func (cfg *apiConfig) handlerPolkaWebhook(w http.ResponseWriter, r *http.Request
 
 	}
 	
+	apiKey, err := auth.GetPolkaApiKey(r.Header)
+	if err != nil || apiKey != cfg.polka_key{
+		respondWithError(w, 401, "Invalid API Key", err)
+		return
+	}
+
+
 	if params.Event != "user.upgraded"{
 		w.WriteHeader(http.StatusNoContent)
 		return
