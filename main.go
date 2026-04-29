@@ -18,6 +18,7 @@ type apiConfig struct {
 	db             *database.Queries
 	platform       string
 	token_string   string
+	polka_key      string
 }
 
 func main() {
@@ -25,6 +26,7 @@ func main() {
 	dbURL := os.Getenv("DB_URL")
 	platform := os.Getenv("PLATFORM")
 	token_string := os.Getenv("TOKEN_STRING")
+	polka_api_key := os.Getenv("POLKA_KEY") 
 
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
@@ -40,6 +42,7 @@ func main() {
 		db:             dbQueries,
 		platform:       platform,
 		token_string:   token_string,
+		polka_key:      polka_api_key,
 	}
 
 	// NewServeMux -> lookup table matching incoming request -> endpoint -> Handler
