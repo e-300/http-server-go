@@ -18,3 +18,17 @@ func GetBearerToken(headers http.Header) (string, error){
 	ts_noWhiteSpace := strings.TrimSpace(ts_noPrefix)
 	return ts_noWhiteSpace, nil
 }
+
+func GetPolkaApiKey(headers http.Header) (string, error){
+	token_string := headers.Get("Authorization")
+	if (token_string == "") || (!strings.HasPrefix(token_string, "ApiKey")){
+		return "", errors.New("No ApiKey")
+	}
+	ts_noPrefix := strings.TrimPrefix(token_string, "ApiKey")
+	if ts_noPrefix == ""{
+		return "", errors.New("Empty Key")
+	}
+	ts_noWhiteSpace := strings.TrimSpace(ts_noPrefix)
+	return ts_noWhiteSpace, nil
+}
+
