@@ -72,10 +72,10 @@ func main() {
 	mux.HandleFunc("POST /api/chirps", apiCfg.createChirp)
 
 	// Get all chirps
-	mux.HandleFunc("GET /api/chirps", apiCfg.handlerChirpsAll)
+	mux.HandleFunc("GET /api/chirps", apiCfg.handlerChirpsRetrieve)
 
 	// Get single chirp
-	mux.HandleFunc("GET /api/chirps/{chirpID}", apiCfg.handlerChirpGet)
+	mux.HandleFunc("GET /api/chirps/{chirpID}", apiCfg.handlerChirpsGet)
 
 	// Login endpoint
 	mux.HandleFunc("POST /api/login", apiCfg.handlerUserLogin)

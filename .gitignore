@@ -3,3 +3,4 @@ out
 http-server-go
 out
 .vscode
+database.json
