@@ -7,16 +7,17 @@ import (
 	"github.com/google/uuid"
 )
 
+// retriving chirp via chirp id in the request path
 func (cfg *apiConfig) handlerChirpsGet(w http.ResponseWriter, r *http.Request) {
 	chirpIdStr := r.PathValue("chirpID")
 	chirpId, err := uuid.Parse(chirpIdStr)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Couldn't get all chirps from database /ncomon mayn", err)
+		respondWithError(w, http.StatusBadRequest, "Bad chirp ID", err)
 		return
 	}
 	dbChirps, err := cfg.db.GetChirp(r.Context(), chirpId)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Couldn't get all chirps from database /ncomon mayn", err)
+		respondWithError(w, http.StatusInternalServerError, "Could not get Chirp", err)
 		return
 	}
 
