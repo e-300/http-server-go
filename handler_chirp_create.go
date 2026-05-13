@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
+	"errors"
+	"strings"
 	"net/http"
 	"time"
+
 	"github.com/e-300/http-server-go/internal/auth"
 	"github.com/e-300/http-server-go/internal/database"
 	"github.com/google/uuid"
@@ -15,69 +16,94 @@ type Chirp struct {
 	ID        uuid.UUID `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-	Body      string	`json:"body"`
 	UserID    uuid.UUID `json:"user_id"`
-
+	Body      string    `json:"body"`
 }
 
-func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request){
-	defer r.Body.Close()
-	type requestBody struct{
-		Msg string `json:"body"`
-		User_id string `json:"user_id"`
+func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request) {
+	type parameters struct {
+		Body     string `json:"body"`
 	}
 
-	decoder := json.NewDecoder(r.Body)
-	params := requestBody{}
-	err := decoder.Decode(&params)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters", err)
-		return
-	}
-
-	// Checking if user is authenticated 
-	
+	// get token from request header
 	token, err := auth.GetBearerToken(r.Header)
-	if err != nil{
-		respondWithError(w, 500, "Something wrong with Bearer", err)
-		fmt.Fprintln(w,token)
-		fmt.Fprintln(w,params.User_id)
-		return 	
-	}
-
-	log.Printf("DEBUG raw token: %q", token) 
-
-	validatedUid, err := auth.ValidateJWT(token, cfg.token_string)
-	if err != nil{
-		respondWithError(w, 401, "Something went wrong when validating", err)
-		return 
-	}
-
-	requestMsg := params.Msg
-	if len(requestMsg) > 140{
-		respondWithError(w, 401, "Chirp is too long dawg", err)
-		return 
-	}
-	cleanedMsg := profaneWords(requestMsg)
-
-
-	postParams := database.CreatePostParams{
-		Body: cleanedMsg,
-		UserID: validatedUid,
-
-	}
-
-	post , err := cfg.db.CreatePost(r.Context(), postParams)
-	if err != nil{
-		log.Println(err)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, "JWT not found in request", err)
 		return
 	}
+
+
+	// validate token from header with jwt secret to get the authenticated uuid
+	validUserID, err := auth.ValidateJWT(token, cfg.jwtSecret)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, "JWT Cant be Authortized", err)
+		return
+	}
+ 	
+	// unmarshalling r.body stream into decoder then mapping decoder var pointer to params
+	decoder := json.NewDecoder(r.Body)
+	params := parameters{}
+	err = decoder.Decode(&params)
+	if err != nil{
+		respondWithError(w, http.StatusInternalServerError, "Couldnt not Decode request parameters", err)
+		return
+	}
+
+	// business logic filter out swear words and chirp len
+	cleaned, err := validateChirp(params.Body)
+	if err != nil{
+		respondWithError(w, http.StatusBadRequest, err.Error(), err)
+	}
 	
-	respondWithJSON(w, 201, Chirp{
-		ID: post.ID,      	
+	// creating a db post object  
+	postParams := database.CreatePostParams{
+		Body:   cleaned,
+		UserID: validUserID,
+	}
+
+	// creating creating the post via the post Params object
+	post, err := cfg.db.CreatePost(r.Context(), postParams)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Couldnt Create Chirp", err)
+		return
+	}
+
+	// response with the created chirp db level details 
+	respondWithJSON(w, http.StatusCreated, Chirp{
+		ID:        post.ID,
 		CreatedAt: post.CreatedAt,
 		UpdatedAt: post.UpdatedAt,
- 		Body: post.Body,
- 		UserID: post.UserID,
-	})   
+		Body:      post.Body,
+		UserID:    post.UserID,
+	})
+}
+
+
+func validateChirp(body string)(string, error){
+	const maxChirpLen = 140
+	if len(body) > maxChirpLen{
+		return "", errors.New("Chirp too long")
+	}
+
+	badWords := map[string]struct{}{
+		"kerfuffle": {},
+		"sharbert" : {},
+		"fornax"   : {},
+	}
+
+	cleaned := getCleanBody(body, badWords)
+	return cleaned, nil
+}
+
+func getCleanBody(body string, badWords map[string]struct{})(string){
+	words := strings.Split(body, " ")
+	for i, word := range words{
+		loweredWord := strings.ToLower(word)
+		if _, ok := badWords[loweredWord]
+		ok{
+			words[i] = "****"
+		}
+	}
+	cleaned := strings.Join(words, " ")
+	return cleaned
 }
