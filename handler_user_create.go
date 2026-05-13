@@ -2,11 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"net/http"
+	"time"
+
 	"github.com/e-300/http-server-go/internal/auth"
 	"github.com/e-300/http-server-go/internal/database"
 	"github.com/google/uuid"
-	"net/http"
-	"time"
 )
 
 type User struct {
@@ -19,8 +20,6 @@ type User struct {
 }
 
 func (cfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-
 	type parameters struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`

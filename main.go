@@ -17,8 +17,8 @@ type apiConfig struct {
 	fileserverHits atomic.Int32
 	db             *database.Queries
 	platform       string
-	token_string   string
-	polka_key      string
+	jwtSecret      string
+	polkaSecret    string
 }
 
 func main() {
@@ -41,8 +41,8 @@ func main() {
 		fileserverHits: atomic.Int32{},
 		db:             dbQueries,
 		platform:       platform,
-		token_string:   token_string,
-		polka_key:      polka_api_key,
+		jwtSecret:   token_string,
+		polkaSecret:      polka_api_key,
 	}
 
 	// NewServeMux -> lookup table matching incoming request -> endpoint -> Handler
@@ -52,49 +52,31 @@ func main() {
 	// Why StripPrefix -> /app/ doesnt exist in our root
 	fsHandler := http.StripPrefix("/app/", http.FileServer(http.Dir(filePathRoot)))
 	wrappedHandler := apiCfg.middlewareMetricsInc(fsHandler)
-
 	mux.Handle("/app/", wrappedHandler)
 
-	mux.HandleFunc("GET /admin/metrics", apiCfg.numOfHits)
-
-	// reset metric hits
-	mux.HandleFunc("POST /admin/reset", apiCfg.resetHits)
 
 	mux.HandleFunc("GET /api/healthz", handlerReadiness)
 
-	// Validate Chirp length
-	mux.HandleFunc("POST /api/validate_chirp", handlerChirpsValidate)
+	mux.HandleFunc("POST /api/polka/webhooks", apiCfg.handlerPolkaWebhook)
 
-	// Create user
-	mux.HandleFunc("POST /api/users", apiCfg.handlerCreateUser)
 
-	// Create Chirp
-	mux.HandleFunc("POST /api/chirps", apiCfg.createChirp)
-
-	// Get all chirps
-	mux.HandleFunc("GET /api/chirps", apiCfg.handlerChirpsRetrieve)
-
-	// Get single chirp
-	mux.HandleFunc("GET /api/chirps/{chirpID}", apiCfg.handlerChirpsGet)
-
-	// Login endpoint
 	mux.HandleFunc("POST /api/login", apiCfg.handlerUserLogin)
-
-	// Refresh end point
 	mux.HandleFunc("POST /api/refresh", apiCfg.handlerRefresh)
-
 	mux.HandleFunc("POST /api/revoke", apiCfg.handlerRevoke)
 
-	// User login end point, allows users to change email and password after auth
+
+	mux.HandleFunc("POST /api/users", apiCfg.handlerCreateUser)
 	mux.HandleFunc("PUT /api/users", apiCfg.handlerUserUpdateLogin)
 
-	// Delete chirp endpoint 
+	mux.HandleFunc("POST /api/chirps", apiCfg.createChirp)
+	mux.HandleFunc("GET /api/chirps", apiCfg.handlerChirpsRetrieve)
+	mux.HandleFunc("GET /api/chirps/{chirpID}", apiCfg.handlerChirpsGet)
 	mux.HandleFunc("DELETE /api/chirps/{chirpID}", apiCfg.handlerDeleteChirp)
 
-	// Webhook
-	mux.HandleFunc("POST /api/polka/webhooks", apiCfg.handlerPolkaWebhook)
 	
 
+	mux.HandleFunc("GET /admin/metrics", apiCfg.numOfHits)
+	mux.HandleFunc("POST /admin/reset", apiCfg.resetHits)
 
 
 	// added pointer to server

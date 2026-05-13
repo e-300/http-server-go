@@ -5,15 +5,12 @@ import (
 	"net/http"
 	"time"
 
-	//"database/sql"
 
 	"github.com/e-300/http-server-go/internal/auth"
 	"github.com/e-300/http-server-go/internal/database"
-	//"github.com/e-300/http-server-go/internal/database"
 )
 
 func (cfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request) {
-	//defer r.Body.Close()
 
 	type parameters struct {
 		Email    string `json:"email"`
@@ -36,31 +33,31 @@ func (cfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request) {
 
 	user, err := cfg.db.GetUserFromEmail(r.Context(), params.Email)
 	if err != nil {
-		respondWithError(w, 401, "Incorrect email or password", err)
+		respondWithError(w, http.StatusInternalServerError, "Incorrect email or password", err)
 		return
 
 	}
 
 	match, err := auth.CheckPasswordHash(params.Password, user.HashedPassword)
 	if err != nil || !match {
-		respondWithError(w, 401, "Incorrect email or password", err)
+		respondWithError(w, http.StatusInternalServerError, "Incorrect email or password", err)
 		return
 	}
 
 	accessToken, err := auth.MakeJWT(
 		user.ID,
-		cfg.token_string,
+		cfg.jwtSecret,
 		time.Hour,
 	)
 	if err != nil {
-		respondWithError(w, 401, "Access Token Signing Issue", err)
+		respondWithError(w, http.StatusInternalServerError, "Access Token Signing Issue", err)
 		return
 	}
 
 	// creating new refresh token
 	refreshToken, err := auth.MakeRefreshToken()
 	if err != nil {
-		respondWithError(w, 401, "Couldnt create access JWT", err)
+		respondWithError(w, http.StatusInternalServerError, "Couldnt create access JWT", err)
 		return
 	}
 
@@ -69,14 +66,13 @@ func (cfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request) {
 		UserID:    user.ID,
 		ExpiresAt: time.Now().UTC().Add(time.Hour * 24 * 60),
 	})
-
 	if err != nil {
-		respondWithError(w, 401, "Couldnt save refresh token", err)
+		respondWithError(w, http.StatusInternalServerError, "Couldnt save refresh token", err)
 		return
 	}
 
 	
-	respondWithJSON(w, 200, response{
+	respondWithJSON(w, http.StatusOK, response{
 		User: User{
 			ID:        user.ID,
 			CreatedAt: user.CreatedAt,
