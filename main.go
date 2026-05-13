@@ -25,8 +25,8 @@ func main() {
 	godotenv.Load()
 	dbURL := os.Getenv("DB_URL")
 	platform := os.Getenv("PLATFORM")
-	token_string := os.Getenv("TOKEN_STRING")
-	polka_api_key := os.Getenv("POLKA_KEY") 
+	token_string := os.Getenv("JWT_SECRET")
+	polka_api_key := os.Getenv("POLKA_SECRET") 
 
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {

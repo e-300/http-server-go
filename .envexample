@@ -1,0 +1,5 @@
+
+DB_URL="postgres://examplePostgresDBurl"
+PLATFORM="dev"
+JWT_SECRET="somerandomseqofNumbersss"
+POLKA_SECRET="AnotherRandomseqofNumberz"

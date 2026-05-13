@@ -53,6 +53,7 @@ func (cfg *apiConfig) createChirp(w http.ResponseWriter, r *http.Request) {
 	cleaned, err := validateChirp(params.Body)
 	if err != nil{
 		respondWithError(w, http.StatusBadRequest, err.Error(), err)
+		return
 	}
 	
 	// creating a db post object  
@@ -99,8 +100,8 @@ func getCleanBody(body string, badWords map[string]struct{})(string){
 	words := strings.Split(body, " ")
 	for i, word := range words{
 		loweredWord := strings.ToLower(word)
-		if _, ok := badWords[loweredWord]
-		ok{
+		if _, ok := badWords[loweredWord]; ok{
+
 			words[i] = "****"
 		}
 	}
